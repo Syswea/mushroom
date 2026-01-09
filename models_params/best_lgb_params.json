@@ -1,0 +1,12 @@
+{
+    "learning_rate": 0.04571020127727049,
+    "num_leaves": 254,
+    "max_depth": 12,
+    "min_child_samples": 98,
+    "subsample": 0.8867030158242971,
+    "colsample_bytree": 0.5005452506291571,
+    "objective": "binary",
+    "metric": "binary_logloss",
+    "device": "gpu",
+    "verbosity": -1
+}
