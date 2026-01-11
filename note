@@ -1,0 +1,55 @@
+cap-diameter
+cap-shape                       bell=b,conical=c,convex=x,flat=f, knobbed=k,sunken=s
+cap-surface                     fibrous=f,grooves=g,scaly=y,smooth=s
+cap-color                       brown=n,buff=b,cinnamon=c,gray=g,green=r, pink=p,purple=u,red=e,white=w,yellow=y
+does-bruise-or-bleed            true=t,false=f
+gill-attachment                 attached=a,descending=d,free=f,notched=n
+gill-spacing                    close=c,crowded=w,distant=d
+gill-color                      black=k,brown=n,buff=b,chocolate=h,gray=g,green=r,orange=o,pink=p,purple=u,red=e,white=w,yellow=y
+stem-height
+stem-width
+stem-root                       bulbous=b,club=c,cup=u,equal=e, rhizomorphs=z,rooted=r,missing=?
+stem-surface                    fibrous=f,scaly=y,silky=k,smooth=s
+stem-color                      brown=n,buff=b,cinnamon=c,gray=g,orange=o, pink=p,red=e,white=w,yellow=y
+veil-type                       partial=p,universal=u
+veil-color                      brown=n,orange=o,white=w,yellow=y
+has-ring                        true=t,false=f
+ring-type                       cobwebby=c,evanescent=e,flaring=f,large=l, none=n,pendant=p,sheathing=s,zone=z
+spore-print-color               black=k,brown=n,buff=b,chocolate=h,green=r, orange=o,purple=u,white=w,yellow=y
+habitat                         grasses=g,leaves=l,meadows=m,paths=p,urban=u,waste=w,woods=d
+season                          autumn=a,spring=s,summer=u,winter=w
+
+
+prompt = """
+## Task
+请识别图片中的真菌（蘑菇）特征，并输出一个严格符合以下 Schema 的 JSON 对象。
+
+## Feature Mapping (Enumeration)
+必须严格使用以下代码映射，如果特征无法观察到，请填入 null。
+
+| Field | Key | Allowed Values / Description |
+| :--- | :--- | :--- |
+| 1. 菌盖直径 | `cap-diameter` | Float (单位: cm) |
+| 2. 菌盖形状 | `cap-shape` | b:bell, c:conical, x:convex, f:flat, k:knobbed, s:sunken |
+| 3. 菌盖表面 | `cap-surface` | f:fibrous, g:grooves, y:scaly, s:smooth |
+| 4. 菌盖颜色 | `cap-color` | n:brown, b:buff, c:cinnamon, g:gray, r:green, p:pink, u:purple, e:red, w:white, y:yellow |
+| 5. 变色反应 | `does-bruise-or-bleed` | t:true, f:false |
+| 6. 菌褶附着 | `gill-attachment` | a:attached, d:descending, f:free, n:notched |
+| 7. 菌褶间距 | `gill-spacing` | c:close, w:crowded, d:distant |
+| 8. 菌褶颜色 | `gill-color` | k:black, n:brown, b:buff, h:chocolate, g:gray, r:green, o:orange, p:pink, u:purple, e:red, w:white, y:yellow |
+| 9. 菌柄高度 | `stem-height` | Float (单位: cm) |
+| 10. 菌柄宽度 | `stem-width` | Float (单位: mm) |
+| 11. 菌柄根部 | `stem-root` | b:bulbous, c:club, u:cup, e:equal, z:rhizomorphs, r:rooted, ?:missing |
+| 12. 菌柄表面 | `stem-surface` | f:fibrous, y:scaly, k:silky, s:smooth |
+| 13. 菌柄颜色 | `stem-color` | n:brown, b:buff, c:cinnamon, g:gray, o:orange, p:pink, e:red, w:white, y:yellow |
+| 14. 菌幕类型 | `veil-type` | p:partial, u:universal |
+| 15. 菌幕颜色 | `veil-color` | n:brown, o:orange, w:white, y:yellow |
+| 16. 是否有环 | `has-ring` | t:true, f:false |
+| 17. 菌环类型 | `ring-type` | c:cobwebby, e:evanescent, f:flaring, l:large, n:none, p:pendant, s:sheathing, z:zone |
+| 18. 孢子印颜色 | `spore-print-color` | k:black, n:brown, b:buff, h:chocolate, g:green, o:orange, u:purple, w:white, y:yellow |
+| 19. 生育地 | `habitat` | g:grasses, l:leaves, m:meadows, p:paths, u:urban, w:waste, d:woods |
+| 20. 季节 | `season` | a:autumn, s:spring, u:summer, w:winter |
+
+## Output Format
+请仅输出 JSON 格式，不要包含 Markdown 代码块外的文字。
+"""
