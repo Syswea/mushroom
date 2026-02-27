@@ -5,10 +5,15 @@ import numpy as np
 import joblib
 from fastapi import FastAPI, HTTPException
 from typing import List, Dict, Any
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 # ----------------------------
 # 1. 初始化 FastAPI 应用
 # ----------------------------
+
 app = FastAPI(
     title="Mushroom Edibility Classifier",
     description="API for predicting mushroom edibility (edible/poisonous)",
@@ -32,7 +37,8 @@ feature_order = [
 @app.on_event("startup")
 def load_models():
     global lgb_model, xgb_model, meta_model, label_encoders
-    model_dir = "../models"
+    # 从环境变量读取模型目录，默认为项目根目录下的 models
+    model_dir = os.getenv("MODEL_DIR", os.path.join(os.getcwd(), "models"))
     
     try:
         # 加载所有模型
@@ -41,10 +47,11 @@ def load_models():
         meta_model = joblib.load(os.path.join(model_dir, "meta_model.pkl"))
         label_encoders = joblib.load(os.path.join(model_dir, "label_encoders.pkl"))
         
-        print("✅ Models loaded successfully at startup")
+        print(f"✅ Models loaded successfully from {model_dir}")
     except Exception as e:
-        print(f"❌ Failed to load models: {e}")
-        raise RuntimeError("Model loading failed")
+        print(f"❌ Failed to load models from {model_dir}: {e}")
+        raise RuntimeError(f"Model loading failed: {e}")
+
 
 # ----------------------------
 # 3. 预处理函数 (修正版)
@@ -170,8 +177,9 @@ async def root():
 
 if __name__ == "__main__":
     import uvicorn
+    port = int(os.getenv("CLASSIFIER_PORT", 8000))
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=8000,
+        port=port,
     )

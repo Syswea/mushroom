@@ -1,3 +1,4 @@
+import os
 import json
 import re
 from typing import Optional, Dict, Any
@@ -5,11 +6,17 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
 import uvicorn
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 app = FastAPI()
 
-# 指向 LM Studio 的本地地址
-client = OpenAI(base_url="http://localhost:1234/v1", api_key="lm-studio")
+# 从环境变量读取 LM Studio 地址，默认为本地 1234 端口
+lm_studio_url = os.getenv("LM_STUDIO_BASE_URL", "http://localhost:1234/v1")
+client = OpenAI(base_url=lm_studio_url, api_key="lm-studio")
+
 
 class ImageRequest(BaseModel):
     image_base64: str
@@ -115,4 +122,5 @@ async def analyze_image(request: ImageRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    port = int(os.getenv("VLM_PORT", 8001))
+    uvicorn.run(app, host="0.0.0.0", port=port)

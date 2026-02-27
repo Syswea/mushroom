@@ -1,13 +1,20 @@
+import os
 import streamlit as st
 from PIL import Image
 import io
 import base64
 import requests
 import time
+from dotenv import load_dotenv
+
+# 加载环境变量
+load_dotenv()
 
 # --- 1. 配置项 ---
-VLM_API_URL = "http://127.0.0.1:8001/analyze-image"
-CLASSIFIER_API_URL = "http://127.0.0.1:8000/predict"
+# 从环境变量读取 API 地址
+VLM_API_URL = os.getenv("VLM_API_URL", "http://127.0.0.1:8001/analyze-image")
+CLASSIFIER_API_URL = os.getenv("CLASSIFIER_API_URL", "http://127.0.0.1:8000/predict")
+
 
 # --- 1. 完整的中英文特征映射配置表 ---
 # 确保这里的 Key 和 Value 代码与分类器训练时的标签编码一致
@@ -165,7 +172,24 @@ MUSHROOM_MAPPING = {
 }
 
 # --- 3. 辅助函数 ---
+@st.cache_data(show_spinner=False)
+def get_vlm_analysis(img_base64: str):
+    """调用 VLM API 提取特征并缓存结果"""
+    try:
+        response = requests.post(
+            VLM_API_URL,
+            json={"image_base64": img_base64},
+            timeout=60
+        )
+        if response.status_code == 200:
+            return response.json()
+        else:
+            return {"error": f"VLM API 错误: {response.text}"}
+    except Exception as e:
+        return {"error": f"无法连接到视觉模型服务器: {e}"}
+
 def predict_toxicity(data_dict: dict):
+
     """调用分类器 API 预测毒性"""
     # 构造 API 要求的 List[Dict] 格式，并补上 id
     payload = [{**data_dict, "id": int(time.time())}]
@@ -197,24 +221,18 @@ if uploaded_file is not None:
 
     if analyze_btn:
         with st.spinner("视觉模型正在解析形态..."):
-            try:
-                buffered = io.BytesIO()
-                image.save(buffered, format="JPEG")
-                img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            buffered = io.BytesIO()
+            image.save(buffered, format="JPEG")
+            img_str = base64.b64encode(buffered.getvalue()).decode("utf-8")
+            
+            result = get_vlm_analysis(img_str)
+            
+            if "error" in result:
+                st.error(result["error"])
+            else:
+                st.session_state['ai_result'] = result
+                st.toast("特征提取成功！请在右侧核对。", icon="✨")
 
-                response = requests.post(
-                    VLM_API_URL,
-                    json={"image_base64": img_str},
-                    timeout=60
-                )
-
-                if response.status_code == 200:
-                    st.session_state['ai_result'] = response.json()
-                    st.toast("特征提取成功！请在右侧核对。", icon="✨")
-                else:
-                    st.error(f"VLM API 错误: {response.text}")
-            except Exception as e:
-                st.error(f"无法连接到视觉模型服务器: {e}")
 
     # --- 5. 人工复核与毒性预测 ---
     if 'ai_result' in st.session_state:
